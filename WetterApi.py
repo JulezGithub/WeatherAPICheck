@@ -21,7 +21,6 @@ class FileHandler:
                 print(f"Luftfeuchtigkeit: {parts[3]} %")
                 print(f"Windgeschwindigkeit: {parts[4]} km/h\n")
                 
-
     def clear(self):
         with open("weather.txt", "w") as f:
             pass                    
