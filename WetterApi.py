@@ -1,9 +1,10 @@
 import requests
+import datetime
 
 class APIHandler:
     api_key = "5806995c2e7faa945b0de9add11473fa"
     def __init__(self):
-        self.city = City()
+        self.weather = Weather()
         self.city_name = ""
     def geocoding(self):
         self.city_name = input("Input city: ")
@@ -19,18 +20,20 @@ class APIHandler:
         curr_temp = r_dict["main"]["temp"]
         humidity = r_dict["main"]["humidity"]
         wind_speed = r_dict["wind"]["speed"]
-        self.city.add_weather_data(self.city_name, desription, curr_temp, humidity, wind_speed)
-        return self.city
+        curr_time = r_dict["dt"]
+        self.weather.add_weather_data(self.city_name, desription, curr_temp, humidity, wind_speed, curr_time)
+        return self.weather
     
-class City:
+class Weather:
     def __init__(self):
         pass
-    def add_weather_data(self, name, desc, temp, humidity, wind_speed):
+    def add_weather_data(self, name, desc, temp, humidity, wind_speed, curr_time):
         self.city_name = name
         self.description = desc
         self.curr_temp = temp
         self.humidity = humidity
         self.wind_speed = wind_speed
+        self.curr_time = datetime.datetime.fromtimestamp(int(curr_time)).strftime('%d-%m-%Y %H:%M:%S')
 
 class WeatherApp:
     def __init__(self):
@@ -40,6 +43,7 @@ class WeatherApp:
         cords = self.api.geocoding()
         city_weather = self.api.weather_data(cords[0], cords[1])
         print(f"Ort: {city_weather.city_name}")
+        print(f"Zeitpunkt: {city_weather.curr_time}")
         print(f"Wetter: {city_weather.description}")
         print(f"Temperatur: {city_weather.curr_temp} °C")
         print(f"Luftfeuchtigkeit: {city_weather.humidity} %")
