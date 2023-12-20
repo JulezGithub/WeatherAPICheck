@@ -1,11 +1,37 @@
 import requests
 import datetime
 
+class FileHandler:
+    def __init__(self):
+        pass
+
+    def write_entry(self, name, desc, temp, humidity, wind_speed, curr_time):
+        with open ("weather.txt", "a") as f:
+            f.write(f"{name};{desc};{temp};{humidity};{wind_speed};{curr_time}\n")
+
+    def read(self):
+        with open ("weather.txt") as f:
+            for line in f:
+                line = line.strip()
+                parts = line.split(";")
+                print(f"Ort: {parts[0]}")
+                print(f"Zeitpunkt: {parts[5]}")
+                print(f"Wetter: {parts[1]}")
+                print(f"Temperatur: {parts[2]} °C")
+                print(f"Luftfeuchtigkeit: {parts[3]} %")
+                print(f"Windgeschwindigkeit: {parts[4]} km/h\n")
+                
+
+    def clear(self):
+        with open("weather.txt", "w") as f:
+            pass                    
+
 class APIHandler:
     api_key = "5806995c2e7faa945b0de9add11473fa"
     def __init__(self):
         self.weather = Weather()
         self.city_name = ""
+        self.file = FileHandler()
     def geocoding(self):
         self.city_name = input("Input city: ")
         country_code = input("Input country code(ISO 3166): ")
@@ -20,8 +46,9 @@ class APIHandler:
         curr_temp = r_dict["main"]["temp"]
         humidity = r_dict["main"]["humidity"]
         wind_speed = r_dict["wind"]["speed"]
-        curr_time = r_dict["dt"]
+        curr_time = datetime.datetime.fromtimestamp(int(r_dict["dt"])).strftime('%d-%m-%Y %H:%M:%S')
         self.weather.add_weather_data(self.city_name, desription, curr_temp, humidity, wind_speed, curr_time)
+        self.file.write_entry(self.city_name, desription, curr_temp, humidity, wind_speed, curr_time)
         return self.weather
     
 class Weather:
@@ -33,11 +60,12 @@ class Weather:
         self.curr_temp = temp
         self.humidity = humidity
         self.wind_speed = wind_speed
-        self.curr_time = datetime.datetime.fromtimestamp(int(curr_time)).strftime('%d-%m-%Y %H:%M:%S')
+        self.curr_time = curr_time
 
 class WeatherApp:
     def __init__(self):
         self.api = APIHandler()
+        self.file = FileHandler()
 
     def get_weather(self):
         cords = self.api.geocoding()
@@ -49,12 +77,26 @@ class WeatherApp:
         print(f"Luftfeuchtigkeit: {city_weather.humidity} %")
         print(f"Windgeschwindigkeit: {city_weather.wind_speed} km/h\n")
 
+    def previous_checks(self):
+        self.file.read()
+
+    def clear_files(self):
+        self.file.clear()    
+
     def execute(self):
         while True:
             print("Weather check App")
-            inpt = input("Press 1 to check the weather of a city or press other key to exit: ")
+            print("Press 1 to check the current weather of a city")
+            print("Press 2 to see previous weather checks")
+            print("Press 3 to clear previous weather checks")
+            print("Press any other key to exit")
+            inpt = input("Input: ")
             if inpt == "1":
                 self.get_weather()
+            elif inpt == "2":
+                self.previous_checks()
+            elif inpt == "3":
+                self.clear_files()   
             else:
                 print("exiting...")
                 break 
