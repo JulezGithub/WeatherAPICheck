@@ -26,7 +26,7 @@ class FileHandler:
             pass                    
 
 class APIHandler:
-    api_key = "5806995c2e7faa945b0de9add11473fa"
+    api_key = "API KEY"
     def __init__(self):
         self.weather = Weather()
         self.city_name = ""
